@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Rocket
   - RocketIcon
+  - RocketLauncher
+  - Base
+  - IronDomeLauncher
   layers:
   - Default
   - TransparentFX

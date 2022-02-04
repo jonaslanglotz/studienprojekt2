@@ -11,11 +11,39 @@ public class IronDomeBattery : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (lastFire + 3 > Time.time)
-        {
-            return;
-        }
         
+        // if (lastFire + 3 > Time.time)
+        // {
+        //     return;
+        // }
+        // 
+        // var targets = GameObject.FindGameObjectsWithTag("Rocket");
+
+        // foreach (var target in targets)
+        // {
+        //     var unguidedComponent = target.GetComponent<UnguidedMissile>();
+
+        //     if (unguidedComponent == null)
+        //     {
+        //         continue;
+        //     }
+
+        //     var missile = Instantiate(missilePrefab);
+
+        //     missile.transform.position = transform.position;
+        //     missile.transform.rotation = transform.rotation;
+        //     
+        //     var missileComponent = missile.GetComponent<MissileScript>();
+
+        //     missileComponent.launcher = gameObject;
+        //     missileComponent.target = target;
+        // }
+
+        // lastFire = Time.time;
+    }
+
+    public IEnumerator Fire(int rocketCount)
+    {
         var targets = GameObject.FindGameObjectsWithTag("Rocket");
 
         foreach (var target in targets)
@@ -27,17 +55,20 @@ public class IronDomeBattery : MonoBehaviour
                 continue;
             }
 
-            var missile = Instantiate(missilePrefab);
+            for (int i = 0; i < rocketCount; i++)
+            {
+                var missile = Instantiate(missilePrefab);
 
-            missile.transform.position = transform.position;
-            missile.transform.rotation = transform.rotation;
+                missile.transform.position = transform.position;
+                missile.transform.rotation = transform.rotation;
             
-            var missileComponent = missile.GetComponent<MissileScript>();
+                var missileComponent = missile.GetComponent<MissileScript>();
 
-            missileComponent.launcher = gameObject;
-            missileComponent.target = target;
+                missileComponent.launcher = gameObject;
+                missileComponent.target = target;
+
+                yield return new WaitForSeconds(0.5f);
+            }
         }
-
-        lastFire = Time.time;
     }
 }

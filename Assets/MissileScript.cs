@@ -44,6 +44,23 @@ public abstract class MissileScript : MonoBehaviour {
 
         timeSinceInitialization = Time.timeSinceLevelLoad - initializationTime;
 
+        if (ShouldExplode())
+        {
+
+            var colliders = Physics.OverlapSphere(position, 20);
+
+            foreach (var collider in colliders)
+            {
+                if (collider.gameObject.CompareTag("Rocket"))
+                {
+                    Destroy(collider.gameObject);
+                }
+            }
+            
+            Destroy(this);
+        }
+        
+
         currentDrag = baseDrag / Mathf.Pow(2, position.y / 5000);
         rb.AddForce(velocity.normalized * Mathf.Pow(velocity.magnitude, 2) * -currentDrag);
         
@@ -59,6 +76,7 @@ public abstract class MissileScript : MonoBehaviour {
         rb.AddTorque(steeringAxis * (Mathf.Clamp(steeringAngle, -maxSteeringAngle, maxSteeringAngle) * steeringForce), ForceMode.Acceleration);
     }
 
+    protected abstract bool ShouldExplode();
     protected abstract bool ShouldFire();
     protected abstract Quaternion GetSteeringAngle();
 }

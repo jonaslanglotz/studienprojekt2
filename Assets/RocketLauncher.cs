@@ -9,9 +9,12 @@ public class RocketLauncher : MonoBehaviour
     public GameObject target;
     public GameObject missilePrefab;
 
+    public GameObject launcherAssembly;
+        
     public float maximumFireTime;
 
     private UnguidedMissilePredictor _predictor;
+    
     
     void Start()
     {
@@ -22,23 +25,42 @@ public class RocketLauncher : MonoBehaviour
     {
         if (!Input.GetKeyDown(KeyCode.L)) return;
 
-        var missile = GameObject.Instantiate(missilePrefab);
+        StartCoroutine(Fire(1));
+    }
+    
+    GameObject CreateMissile()
+    {
+        var missile = Instantiate(missilePrefab);
         
-        var distanceToTarget = (target.transform.position - this.transform.position).magnitude;
-
-        var rb = missile.GetComponent<Rigidbody>();
         var script = missile.GetComponent<UnguidedMissile>();
-
         script.launcher = gameObject;
         script.target = target;
 
+        return missile;
+    }
+
+    void SetFiringParameters(GameObject missile, float fireTime, float angle)
+    {
+        var script = missile.GetComponent<UnguidedMissile>();
+        script.fireTime = fireTime;
+
+        missile.transform.position = transform.position;
+        missile.transform.rotation = Quaternion.AngleAxis(-90 + angle, Vector3.Cross(target.transform.position - transform.position, Vector3.up));
+    }
+
+    void CalculateLaunchParameters(GameObject missile, out float angle, out float fireTime)
+    {
+        var distanceToTarget = (target.transform.position - transform.position).magnitude;
+        var rb = missile.GetComponent<Rigidbody>();
+        var script = missile.GetComponent<UnguidedMissile>();
+        
         var optimalFireTime = 0f;
         var optimalAngle = 0f;
         var optimalOffset = float.MaxValue;
 
         for (var i = 1; i < 4; i++)
         {
-            var fireTime = maximumFireTime * (i / 3f);
+            var currentFireTime = maximumFireTime * (i / 3f);
 
             var min = 0f;
             var max = 57f;
@@ -52,7 +74,7 @@ public class RocketLauncher : MonoBehaviour
             {
                 
                 
-                _predictor.SetMissile(rb.mass, script.maxSpeed, script.baseDrag, fireTime, currentAngle);
+                _predictor.SetMissile(rb.mass, script.maxSpeed, script.baseDrag, currentFireTime, currentAngle);
                 try
                 {
                     currentDistance = _predictor.SimulateImpactPoint();
@@ -65,13 +87,11 @@ public class RocketLauncher : MonoBehaviour
 
                 var offset = distanceToTarget - currentDistance;
                 
-                Debug.Log($"currentAngle: {currentAngle}, min: {min}, max: {max}, offset: {offset}, fireTime: {fireTime}, distance: {distanceToTarget}, calcDistance: {currentDistance}");
-
                 if (Mathf.Abs(offset) < optimalOffset)
                 {
                     optimalOffset = Mathf.Abs(offset);
                     optimalAngle = currentAngle;
-                    optimalFireTime = fireTime;
+                    optimalFireTime = currentFireTime;
                 }
 
                 if (offset >= 0)
@@ -91,11 +111,47 @@ public class RocketLauncher : MonoBehaviour
             }
         }
 
-        script.fireTime = optimalFireTime;
-        
-        Debug.Log($"FireTime: {optimalFireTime}, Angle: {optimalAngle}, CalculatedOffset: {optimalOffset}");
+        angle = optimalAngle;
+        fireTime = optimalFireTime;
+    }
+    
 
-        missile.transform.position = transform.position;
-        missile.transform.rotation = Quaternion.AngleAxis(-90 + optimalAngle, Vector3.Cross(target.transform.position - transform.position, Vector3.up));
+    public IEnumerator Fire(int rocketCount)
+    {
+        const float angleStep = 0.1f;
+        
+        CalculateLaunchParameters(missilePrefab, out var firingAngle, out var fireTime );
+
+        var initialVerticalRotation = launcherAssembly.transform.localRotation.eulerAngles.x;
+        // var endVerticalRotation = Quaternion.Euler(firingAngle, 0f, 0f);
+
+        var targetVector = target.transform.position - transform.position;
+        var initialHorizontalRotation = transform.rotation.eulerAngles.y;
+        Debug.Log(initialHorizontalRotation);
+        var endHorizontalRotation = Vector3.Angle(targetVector, Vector3.forward) - 180;
+        endHorizontalRotation = targetVector.x < 0 ? -endHorizontalRotation : endHorizontalRotation;
+        Debug.Log(endHorizontalRotation);
+
+        var maxAngleDifference = Mathf.Max(Mathf.Abs(Mathf.DeltaAngle(firingAngle, initialVerticalRotation)),
+            Mathf.Abs(Mathf.DeltaAngle(endHorizontalRotation, initialHorizontalRotation)));
+        
+        for (int i = 0; i < maxAngleDifference; i++)
+        {
+            launcherAssembly.transform.localRotation = Quaternion.AngleAxis(
+                Mathf.LerpAngle(initialVerticalRotation, firingAngle, i / maxAngleDifference), Vector3.right);
+            transform.rotation = Quaternion.AngleAxis(Mathf.LerpAngle(initialHorizontalRotation, endHorizontalRotation, i/maxAngleDifference), Vector3.up);
+            yield return new WaitForEndOfFrame();
+        }
+        launcherAssembly.transform.localRotation = Quaternion.AngleAxis(firingAngle, Vector3.right);
+        transform.rotation = Quaternion.AngleAxis(endHorizontalRotation, Vector3.up);
+
+        for (int i = 0; i < rocketCount; i++)
+        {
+            var missile = CreateMissile();
+            SetFiringParameters(missile, fireTime, firingAngle);
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        yield return null;
     }
 }

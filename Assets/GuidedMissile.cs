@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 
 public class GuidedMissile : MissileScript
@@ -10,6 +11,13 @@ public class GuidedMissile : MissileScript
         base.Start();
         _proportionalNavigation = new ProportionalNavigationHelper(1);
     }
+
+    protected override bool ShouldExplode()
+    {
+        var colliders = Physics.OverlapSphere(transform.position, 20);
+        return colliders.Any(collider => collider.gameObject.Equals(target));
+    }
+
     protected override bool ShouldFire()
     {
         return true;
