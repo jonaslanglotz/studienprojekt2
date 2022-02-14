@@ -14,7 +14,12 @@ public class GuidedMissile : MissileScript
 
     protected override bool ShouldExplode()
     {
-        var colliders = Physics.OverlapSphere(transform.position, 20);
+        if (target == null)
+        {
+            return true;
+        }
+        
+        var colliders = Physics.OverlapSphere(transform.position, 50);
         return colliders.Any(collider => collider.gameObject.Equals(target));
     }
 
@@ -25,6 +30,12 @@ public class GuidedMissile : MissileScript
 
     protected override Quaternion GetSteeringAngle()
     {
+
+        if (target == null)
+        {
+            return Quaternion.identity;
+        }
+        
         UpdateProportionalNavigationData();
         
         var rotation = CalculateSteeringAngle();

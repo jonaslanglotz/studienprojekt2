@@ -30,6 +30,6 @@ public class UnguidedMissile : MissileScript
 
     protected override Quaternion GetSteeringAngle()
     {
-        return ShouldFire() ? Quaternion.identity : Quaternion.FromToRotation(transform.forward, rb.velocity);
+        return ShouldFire() ? Quaternion.identity : Quaternion.FromToRotation(transform.up, rb.velocity);
     }
 }

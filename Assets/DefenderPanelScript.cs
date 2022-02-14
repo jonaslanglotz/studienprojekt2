@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -8,29 +6,29 @@ using UnityEngine.UI;
 public class DefenderPanelScript : MonoBehaviour
 {
 
-    public TMP_Dropdown BaseDropdown;
+    public TMP_Dropdown baseDropdown;
     public Slider rocketCountSlider;
     public TMP_Text rocketCountLabel;
     public Button startButton;
     
-    private Dictionary<String, GameObject> baseMap;
+    private Dictionary<string, GameObject> _baseMap;
     
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        baseMap = new Dictionary<string, GameObject>();
+        _baseMap = new Dictionary<string, GameObject>();
         
         var bases = GameObject.FindGameObjectsWithTag("Base");
 
-        for (int i = 0; i < bases.Length; i++)
+        for (var i = 0; i < bases.Length; i++)
         {
-            baseMap.Add($"Startrampe {i}", bases[i]);
+            _baseMap.Add($"Startbasis {i+1}", bases[i]);
         } 
         
-        BaseDropdown.options.Clear();
-        foreach (var startBase in baseMap.Keys)
+        baseDropdown.options.Clear();
+        foreach (var startBase in _baseMap.Keys)
         {
-            BaseDropdown.options.Add(new TMP_Dropdown.OptionData(startBase));
+            baseDropdown.options.Add(new TMP_Dropdown.OptionData(startBase));
         }
         
         rocketCountSlider.onValueChanged.AddListener(value => rocketCountLabel.text = Mathf.FloorToInt(value).ToString());
@@ -38,19 +36,18 @@ public class DefenderPanelScript : MonoBehaviour
         startButton.onClick.AddListener(Fire);
         
     }
-    
-    void Fire()
+
+    private void Fire()
     {
-        baseMap.TryGetValue(BaseDropdown.options[BaseDropdown.value].text, out var baseGameObject);
+        _baseMap.TryGetValue(baseDropdown.options[baseDropdown.value].text, out var baseGameObject);
+
+        if (baseGameObject == null)
+        {
+            return;
+        }
 
         var launcher = baseGameObject.transform.GetComponentInChildren<IronDomeBattery>();
 
         StartCoroutine(launcher.Fire(Mathf.FloorToInt(rocketCountSlider.value)));
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

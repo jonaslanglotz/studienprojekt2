@@ -1,7 +1,5 @@
-using System;
 using UnityEngine;
 using UnityEngine.Serialization;
-using UnityEngine.UI;
 using UnityEngine.VFX;
 
 
@@ -12,7 +10,7 @@ public abstract class MissileScript : MonoBehaviour {
     public float maxSteeringAngle = 15;
     public float baseDrag = 0.1f;
     public VisualEffect engine;
-    public GameObject light;
+    [FormerlySerializedAs("light")] public GameObject engineLight;
     
     public float currentDrag;
 
@@ -47,7 +45,7 @@ public abstract class MissileScript : MonoBehaviour {
         if (ShouldExplode())
         {
 
-            var colliders = Physics.OverlapSphere(position, 20);
+            var colliders = Physics.OverlapSphere(position, 100);
 
             foreach (var collider in colliders)
             {
@@ -62,14 +60,14 @@ public abstract class MissileScript : MonoBehaviour {
         
 
         currentDrag = baseDrag / Mathf.Pow(2, position.y / 5000);
-        rb.AddForce(velocity.normalized * Mathf.Pow(velocity.magnitude, 2) * -currentDrag);
+        rb.AddForce(velocity.normalized * (Mathf.Pow(velocity.magnitude, 2) * -currentDrag));
         
         if (ShouldFire())
         {
             rb.AddForce(forward * (maxSpeed), ForceMode.Acceleration);
         }
         engine.SetBool("EngineFiring", ShouldFire());
-        light.SetActive(ShouldFire());
+        engineLight.SetActive(ShouldFire());
         
         GetSteeringAngle().ToAngleAxis(out var steeringAngle, out var steeringAxis);
 
@@ -79,4 +77,5 @@ public abstract class MissileScript : MonoBehaviour {
     protected abstract bool ShouldExplode();
     protected abstract bool ShouldFire();
     protected abstract Quaternion GetSteeringAngle();
+
 }

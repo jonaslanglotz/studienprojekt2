@@ -34,9 +34,9 @@ public class UnguidedMissilePredictor
         _firingAngle = firingAngle;
     }
 
-    public float SimulateImpactPoint()
+    public float SimulateImpactPoint(float launchHeight, float targetHeight)
     {
-        _position = Vector2.zero;
+        _position = new Vector2(0, launchHeight);
         _velocity = Vector2.zero;
         _step = 0;
 
@@ -44,10 +44,13 @@ public class UnguidedMissilePredictor
         {
             Step();
 
-            if (_position.y < 0)
+            if (_position.y < targetHeight && _velocity.y < 0f)
             {
-                var bias = Mathf.Pow(_firingAngle / 45f, 2f) * 300 + (_position.x / 300);
-                return _position.x - bias;
+                Debug.Log($"t: ${elapsedTime()}; pos: ${_position}; fire: ${_fireTime}");
+                // var bias = Mathf.Pow(_firingAngle / 45f, 2f) * 300 + (_position.x / 300);
+                var bias = Mathf.Pow(_firingAngle / 45f, 2f) * 300;
+                // var bias = 0;
+                return _position.x + bias;
             }
         }
         
@@ -56,7 +59,7 @@ public class UnguidedMissilePredictor
 
     private void Step()
     {
-        var elapsedTime = _step * _stepSize;
+        var elapsedTime = this.elapsedTime();
         
         //Debug.Log($"Time: {elapsedTime}; Step: {_step}, Position: {_position}; Velocity: {_velocity}; IsFiring: {elapsedTime < _fireTime}");
 
@@ -75,5 +78,10 @@ public class UnguidedMissilePredictor
         
         _position += _velocity * _stepSize; 
         _step++;
+    }
+
+    private float elapsedTime()
+    {
+        return _step * _stepSize;
     }
 }

@@ -8,8 +8,6 @@ public class ProportionalNavigationHelper
     private Vector3 _position = Vector3.zero;
     private Vector3 _lastPosition = Vector3.zero;
     private Vector3 _velocity = Vector3.zero;
-    private Vector3 _lastVelocity = Vector3.zero;
-    private Vector3 _acceleration = Vector3.zero;
 
     private Vector3 _targetPosition = Vector3.zero;
     private Vector3 _targetLastPosition = Vector3.zero;
@@ -21,9 +19,6 @@ public class ProportionalNavigationHelper
 
     public void EnterMissilePosition(Vector3 position)
     {
-        _acceleration = (_velocity - _lastVelocity) / Time.fixedDeltaTime;
-        
-        _lastVelocity = _velocity;
         _velocity = (_position - _lastPosition) / Time.fixedDeltaTime;
         
         _lastPosition = _position;

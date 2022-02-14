@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -13,26 +11,29 @@ public class AttackerPanelScript : MonoBehaviour
     public Slider rocketCount;
     public TMP_Text rocketCountLabel;
     public Button startButton;
+    
+    public Button startCameraButton;
+    public Button targetCameraButton;
 
-    private Dictionary<String, GameObject> rocketLauncherMap;
-    private Dictionary<String, GameObject> targetMap;
+    private Dictionary<string, GameObject> _rocketLauncherMap;
+    private Dictionary<string, GameObject> _targetMap;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
 
-        rocketLauncherMap = new Dictionary<string, GameObject>();
-        targetMap = new Dictionary<string, GameObject>();
+        _rocketLauncherMap = new Dictionary<string, GameObject>();
+        _targetMap = new Dictionary<string, GameObject>();
         
         var launchers = GameObject.FindGameObjectsWithTag("RocketLauncher");
 
-        for (int i = 0; i < launchers.Length; i++)
+        for (var i = 0; i < launchers.Length; i++)
         {
-            rocketLauncherMap.Add($"Startrampe {i}", launchers[i]);
+            _rocketLauncherMap.Add($"Startrampe {i+1}", launchers[i]);
         } 
         
         startBase.options.Clear();
-        foreach (var rocketLauncher in rocketLauncherMap.Keys)
+        foreach (var rocketLauncher in _rocketLauncherMap.Keys)
         {
             startBase.options.Add(new TMP_Dropdown.OptionData(rocketLauncher));
         }
@@ -40,13 +41,13 @@ public class AttackerPanelScript : MonoBehaviour
         
         var targets = GameObject.FindGameObjectsWithTag("Base");
 
-        for (int i = 0; i < targets.Length; i++)
+        for (var i = 0; i < targets.Length; i++)
         {
-            targetMap.Add($"Basis {i}", targets[i]);
+            _targetMap.Add($"Basis {i}", targets[i]);
         } 
         
         targetBase.options.Clear();
-        foreach (var target in targetMap.Keys)
+        foreach (var target in _targetMap.Keys)
         {
             targetBase.options.Add(new TMP_Dropdown.OptionData(target));
         }
@@ -54,23 +55,53 @@ public class AttackerPanelScript : MonoBehaviour
         rocketCount.onValueChanged.AddListener(value => rocketCountLabel.text = Mathf.FloorToInt(value).ToString());
         
         startButton.onClick.AddListener(Fire);
+        
+        startCameraButton.onClick.AddListener(SetStartCamera);
+        targetCameraButton.onClick.AddListener(SetTargetCamera);
     }
 
-    void Fire()
+    private void SetStartCamera()
     {
-        rocketLauncherMap.TryGetValue(startBase.options[startBase.value].text, out var launcherGameObject);
+        _rocketLauncherMap.TryGetValue(startBase.options[startBase.value].text, out var launcherGameObject);
+
+        if (launcherGameObject == null)
+        {
+            return;
+        }
+
+        var startCamera = launcherGameObject.GetComponentInChildren<Camera>();
+        
+        CameraManager.SetCamera(startCamera);
+    }
+
+    private void SetTargetCamera()
+    {
+        _targetMap.TryGetValue(targetBase.options[targetBase.value].text, out var targetGameObject);
+        
+        if (targetGameObject == null)
+        {
+            return;
+        }
+
+        var targetCamera = targetGameObject.GetComponentInChildren<Camera>();
+        
+        CameraManager.SetCamera(targetCamera);
+    }
+
+    private void Fire()
+    {
+        _rocketLauncherMap.TryGetValue(startBase.options[startBase.value].text, out var launcherGameObject);
+
+        if (launcherGameObject == null)
+        {
+            return;
+        }
 
         var launcher = launcherGameObject.GetComponent<RocketLauncher>();
 
-        targetMap.TryGetValue(targetBase.options[targetBase.value].text, out var target);
+        _targetMap.TryGetValue(targetBase.options[targetBase.value].text, out var target);
         launcher.target = target;
 
         StartCoroutine(launcher.Fire(Mathf.FloorToInt(rocketCount.value)));
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

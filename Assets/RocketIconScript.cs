@@ -21,14 +21,17 @@ public class RocketIconScript : MonoBehaviour
         foreach (var rocket in rockets)
         {
             
-            var position = Camera.main.WorldToScreenPoint(rocket.transform.position);
+            var mainCamera = Camera.main;
+
+            if (mainCamera == null)
+            {
+                return;
+            }
+            
+            var position = mainCamera.WorldToScreenPoint(rocket.transform.position);
             position.z = 0;
             
-            var rotation = rocket.transform.rotation;
-            rotation.ToAngleAxis(out var angle, out var axis);
-
-            var projection = Vector3.Dot(axis, Vector3.up)* Vector3.up;
-            var twist = new Quaternion(projection.x, projection.y, projection.z, rotation.w).normalized;
+            var twist = Util.GetQuaternionTwist(rocket.transform.rotation, Vector3.up);
             var twistEuler = twist.eulerAngles;
 
             GameObject icon = null;

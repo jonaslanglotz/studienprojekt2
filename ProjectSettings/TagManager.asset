@@ -9,6 +9,9 @@ TagManager:
   - RocketLauncher
   - Base
   - IronDomeLauncher
+  - BaseIcon
+  - RocketLauncherIcon
+  - CameraManager
   layers:
   - Default
   - TransparentFX

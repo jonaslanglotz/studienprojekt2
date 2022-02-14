@@ -43,6 +43,7 @@ public class RocketLauncher : MonoBehaviour
     {
         var script = missile.GetComponent<UnguidedMissile>();
         script.fireTime = fireTime;
+        script.launchAngle = angle;
 
         missile.transform.position = transform.position;
         missile.transform.rotation = Quaternion.AngleAxis(-90 + angle, Vector3.Cross(target.transform.position - transform.position, Vector3.up));
@@ -51,6 +52,7 @@ public class RocketLauncher : MonoBehaviour
     void CalculateLaunchParameters(GameObject missile, out float angle, out float fireTime)
     {
         var distanceToTarget = (target.transform.position - transform.position).magnitude;
+        
         var rb = missile.GetComponent<Rigidbody>();
         var script = missile.GetComponent<UnguidedMissile>();
         
@@ -77,7 +79,7 @@ public class RocketLauncher : MonoBehaviour
                 _predictor.SetMissile(rb.mass, script.maxSpeed, script.baseDrag, currentFireTime, currentAngle);
                 try
                 {
-                    currentDistance = _predictor.SimulateImpactPoint();
+                    currentDistance = _predictor.SimulateImpactPoint(transform.position.y, target.transform.position.y);
                 }
                 catch (Exception e)
                 {
