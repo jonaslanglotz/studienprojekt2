@@ -43,7 +43,7 @@ public class AttackerPanelScript : MonoBehaviour
 
         for (var i = 0; i < targets.Length; i++)
         {
-            _targetMap.Add($"Basis {i}", targets[i]);
+            _targetMap.Add($"Basis {i+1}", targets[i]);
         } 
         
         targetBase.options.Clear();
