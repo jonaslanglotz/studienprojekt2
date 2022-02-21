@@ -46,7 +46,7 @@ public class UnguidedMissilePredictor
 
             if (_position.y < targetHeight && _velocity.y < 0f)
             {
-                Debug.Log($"t: ${elapsedTime()}; pos: ${_position}; fire: ${_fireTime}");
+                // Debug.Log($"t: ${elapsedTime()}; pos: ${_position}; fire: ${_fireTime}");
                 // var bias = Mathf.Pow(_firingAngle / 45f, 2f) * 300 + (_position.x / 300);
                 var bias = Mathf.Pow(_firingAngle / 45f, 2f) * 300;
                 // var bias = 0;

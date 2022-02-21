@@ -123,16 +123,15 @@ public class RocketLauncher : MonoBehaviour
         const float angleStep = 0.1f;
         
         CalculateLaunchParameters(missilePrefab, out var firingAngle, out var fireTime );
+        Debug.Log($"angle: ${firingAngle}, time: ${fireTime}");
 
         var initialVerticalRotation = launcherAssembly.transform.localRotation.eulerAngles.x;
         // var endVerticalRotation = Quaternion.Euler(firingAngle, 0f, 0f);
 
         var targetVector = target.transform.position - transform.position;
         var initialHorizontalRotation = transform.rotation.eulerAngles.y;
-        Debug.Log(initialHorizontalRotation);
         var endHorizontalRotation = Vector3.Angle(targetVector, Vector3.forward) - 180;
         endHorizontalRotation = targetVector.x < 0 ? -endHorizontalRotation : endHorizontalRotation;
-        Debug.Log(endHorizontalRotation);
 
         var maxAngleDifference = Mathf.Max(Mathf.Abs(Mathf.DeltaAngle(firingAngle, initialVerticalRotation)),
             Mathf.Abs(Mathf.DeltaAngle(endHorizontalRotation, initialHorizontalRotation)));

@@ -731,7 +731,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &8901572540028625602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -745,11 +745,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 220
-  steeringForce: 0.1
+  steeringForce: 3
   maxSteeringAngle: 15
   baseDrag: 0.03
   engine: {fileID: 8369182822831958032}
-  light: {fileID: 7006614703866763229}
+  engineLight: {fileID: 7006614703866763229}
   currentDrag: 0
   initializationTime: 0
   timeSinceInitialization: 0

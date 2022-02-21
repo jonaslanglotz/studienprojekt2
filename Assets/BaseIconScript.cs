@@ -6,7 +6,7 @@ public class BaseIconScript : MonoBehaviour {
     public GameObject iconContainer;
     public GameObject iconPrefab;
 
-    private static readonly Dictionary<GameObject, GameObject> IconsToBaseObject = new Dictionary<GameObject, GameObject>();
+    public static readonly Dictionary<GameObject, GameObject> IconsToBaseObject = new Dictionary<GameObject, GameObject>();
 
     // Update is called once per frame
     private void Update()
@@ -26,6 +26,12 @@ public class BaseIconScript : MonoBehaviour {
             }
             
             var position = mainCamera.WorldToScreenPoint(baseObject.transform.position);
+            
+            if (position.z < 0)
+            {
+                continue;
+            }
+
             position.z = 0;
 
             GameObject icon;
@@ -48,8 +54,10 @@ public class BaseIconScript : MonoBehaviour {
             IconsToBaseObject[icon] = baseObject;
         }
         
+        
         foreach (var icon in lastFrameIconsToBaseObjects.Keys)
         {
+            Debug.Log("Destroy");
             Destroy(icon);
         }
     }

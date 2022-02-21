@@ -15,6 +15,8 @@ public class AttackerPanelScript : MonoBehaviour
     public Button startCameraButton;
     public Button targetCameraButton;
 
+    public CameraManager cameraManager;
+
     private Dictionary<string, GameObject> _rocketLauncherMap;
     private Dictionary<string, GameObject> _targetMap;
 
@@ -63,29 +65,13 @@ public class AttackerPanelScript : MonoBehaviour
     private void SetStartCamera()
     {
         _rocketLauncherMap.TryGetValue(startBase.options[startBase.value].text, out var launcherGameObject);
-
-        if (launcherGameObject == null)
-        {
-            return;
-        }
-
-        var startCamera = launcherGameObject.GetComponentInChildren<Camera>();
-        
-        CameraManager.SetCamera(startCamera);
+        cameraManager.SetFocus(launcherGameObject);
     }
 
     private void SetTargetCamera()
     {
         _targetMap.TryGetValue(targetBase.options[targetBase.value].text, out var targetGameObject);
-        
-        if (targetGameObject == null)
-        {
-            return;
-        }
-
-        var targetCamera = targetGameObject.GetComponentInChildren<Camera>();
-        
-        CameraManager.SetCamera(targetCamera);
+        cameraManager.SetFocus(targetGameObject);
     }
 
     private void Fire()

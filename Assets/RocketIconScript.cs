@@ -29,20 +29,23 @@ public class RocketIconScript : MonoBehaviour
             }
             
             var position = mainCamera.WorldToScreenPoint(rocket.transform.position);
+            
+            if (position.z < 0)
+            {
+                continue;
+            }
+            
             position.z = 0;
             
-            var twist = Util.GetQuaternionTwist(rocket.transform.rotation, Vector3.up);
-            var twistEuler = twist.eulerAngles;
-
             GameObject icon = null;
             if (lastFrameIconsToRocketObjects.ContainsValue(rocket))
             {
                 icon = lastFrameIconsToRocketObjects.Keys.FirstOrDefault(key => lastFrameIconsToRocketObjects[key] == rocket);
 
+                
                 if (icon != null)
                 {
                     icon.transform.position = position;
-                    icon.transform.rotation = Quaternion.Euler(0,0 , twistEuler.y + 90);
 
                     IconsToRocketObject[icon] = rocket;
                     lastFrameIconsToRocketObjects.Remove(icon);
@@ -51,12 +54,13 @@ public class RocketIconScript : MonoBehaviour
                 }
             }
             
-            icon = Instantiate(IconPrefab, position, Quaternion.Euler(0,0 , twistEuler.y + 90), IconContainer.transform);
+            icon = Instantiate(IconPrefab, position, Quaternion.Euler(0,0 , 0), IconContainer.transform);
             IconsToRocketObject[icon] = rocket;
         }
         
         foreach (var icon in lastFrameIconsToRocketObjects.Keys)
         {
+            Debug.Log("Destroy");
             Destroy(icon);
         }
     }

@@ -1,51 +1,82 @@
+using System;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    private static Camera _currentCamera;
-    private static Camera _mainCamera;
+    public GameObject focusedObject;
+    public GameObject defaultFocusedObject;
+    public float distance;
+    public Vector2 direction;
+    public Vector3 offset;
+    public float sensitivity;
 
-    private void Start()
-    {
-        _mainCamera = Camera.main;
-        _currentCamera = _mainCamera;
-    }
+    private float DEFAULT_DISTANCE = 50000;
+    private Vector2 DEFAULT_DIRECTION = new Vector2(45,30);
+    
+    private Vector2 _lastMousePosition;
 
     private void Update()
     {
-        if (_currentCamera == null)
-        {
-            ResetCamera();
-        }
+
+        ApplyInput();
         
+        transform.position = CalculatePosition();
+        transform.rotation = CalculateRotation();
     }
 
-    public static void SetCamera(Camera camera)
+    private void ApplyInput()
     {
-        if (_currentCamera == null)
+        HandleDrag();
+        HandleScroll();
+    }
+
+    private void HandleDrag()
+    {
+        if (Input.GetMouseButton(2))
         {
-            _currentCamera = _mainCamera;
-            _currentCamera.enabled = true;
-        }
+            Vector2 mousePosition = Input.mousePosition;
 
-        if (camera == _currentCamera)
+            var mouseDelta = (mousePosition - _lastMousePosition) * sensitivity;
+
+            direction = new Vector2(direction.x + mouseDelta.x, Mathf.Clamp(direction.y - mouseDelta.y, -90, 90));
+
+            _lastMousePosition = mousePosition;
+        }
+        else
         {
-            return;
+            _lastMousePosition = Input.mousePosition;
         }
-
-        _currentCamera.enabled = false;
-        _currentCamera = camera;
-        _currentCamera.enabled = true;
     }
 
-    public static void ResetCamera()
+    private void HandleScroll()
     {
-        SetCamera(_mainCamera);
+        distance = Mathf.Clamp(distance - distance * 0.1f * Input.mouseScrollDelta.y, 0.1f, 80000f);
     }
 
-    public static bool IsMainCamera()
+    private Quaternion CalculateRotation()
     {
-        return _currentCamera == _mainCamera;
+        return Quaternion.Euler(direction.y, direction.x, 0);
     }
-    
+
+    private Vector3 CalculatePosition()
+    {
+        var focusedObjectPosition = focusedObject != null ? focusedObject.transform.position : defaultFocusedObject.transform.position;
+
+        var distanceVector =  CalculateRotation() * Vector3.back * distance;
+        var position = focusedObjectPosition + distanceVector + offset;
+        
+        return position;
+    }
+
+    public void SetFocus(GameObject gameObject)
+    {
+        focusedObject = gameObject;
+    }
+
+    public void ResetCamera()
+    {
+        distance = DEFAULT_DISTANCE;
+        direction = DEFAULT_DIRECTION;
+        focusedObject = null;
+    }
 }

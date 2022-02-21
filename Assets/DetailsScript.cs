@@ -22,6 +22,8 @@ public class DetailsScript : MonoBehaviour
 
     public GameObject selectedRocket;
 
+    public CameraManager cameraManager;
+
     private void Start()
     {
         cameraButton.onClick.AddListener(SelectRocketCamera);
@@ -29,14 +31,7 @@ public class DetailsScript : MonoBehaviour
 
     private void SelectRocketCamera()
     {
-        if (selectedRocket == null)
-        {
-            return;
-        }
-
-        var rocketCamera = selectedRocket.GetComponentInChildren<Camera>();
-        
-        CameraManager.SetCamera(rocketCamera);
+        cameraManager.SetFocus(selectedRocket);
     }
 
     private void Update()

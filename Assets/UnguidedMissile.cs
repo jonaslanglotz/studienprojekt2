@@ -25,6 +25,10 @@ public class UnguidedMissile : MissileScript
 
     protected override bool ShouldFire()
     {
+        if (timeSinceInitialization < 0.2)
+        {
+            Debug.Log($"Rocket: ${transform.name}, ${transform.position}, ${transform.rotation}");
+        }
         return timeSinceInitialization < fireTime;
     }
 

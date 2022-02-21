@@ -28,6 +28,12 @@ public class RocketLauncherIconScript:MonoBehaviour
             }
             
             var position = mainCamera.WorldToScreenPoint(rocketLauncher.transform.position);
+            
+            if (position.z < 0)
+            {
+                continue;
+            }
+            
             position.z = 0;
 
             GameObject icon = null;
