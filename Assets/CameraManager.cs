@@ -14,6 +14,7 @@ public class CameraManager : MonoBehaviour
     private Vector2 DEFAULT_DIRECTION = new Vector2(45,30);
     
     private Vector2 _lastMousePosition;
+    private Vector3 _lastFocusPosition;
 
     private void Update()
     {
@@ -62,8 +63,22 @@ public class CameraManager : MonoBehaviour
     {
         var focusedObjectPosition = focusedObject != null ? focusedObject.transform.position : defaultFocusedObject.transform.position;
 
+        Vector3 focusPosition;
+        if (focusedObject != null && focusedObject.TryGetComponent<Rigidbody>(out _))
+        {
+            var lerpFactor = 0.1f + Mathf.Exp(-(((focusedObjectPosition - _lastFocusPosition).magnitude / 10) - 10) );
+            focusPosition = Vector3.Lerp(_lastFocusPosition, focusedObjectPosition, lerpFactor);
+        }
+        else
+        {
+            focusPosition = Vector3.Lerp(_lastFocusPosition, focusedObjectPosition, 0.1f);
+        }
+        
+
         var distanceVector =  CalculateRotation() * Vector3.back * distance;
-        var position = focusedObjectPosition + distanceVector + offset;
+        var position = focusPosition + distanceVector + offset;
+
+        _lastFocusPosition = focusPosition;
         
         return position;
     }
