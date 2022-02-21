@@ -10,6 +10,7 @@ public abstract class MissileScript : MonoBehaviour {
     public float maxSteeringAngle = 15;
     public float baseDrag = 0.1f;
     public VisualEffect engine;
+    public GameObject explosion;
     [FormerlySerializedAs("light")] public GameObject engineLight;
     
     public float currentDrag;
@@ -49,16 +50,19 @@ public abstract class MissileScript : MonoBehaviour {
         if (ShouldExplode())
         {
 
-            var colliders = Physics.OverlapSphere(position, 100);
+            var colliders = Physics.OverlapSphere(position, 50);
 
             foreach (var collider in colliders)
             {
                 if (collider.gameObject.CompareTag("Rocket"))
                 {
+                    Instantiate(explosion, collider.gameObject.transform.position,
+                        collider.gameObject.transform.rotation);
                     Destroy(collider.gameObject);
                 }
             }
-            
+
+            Instantiate(explosion, position, transform.rotation);
             Destroy(this);
         }
         

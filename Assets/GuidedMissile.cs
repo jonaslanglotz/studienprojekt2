@@ -19,7 +19,7 @@ public class GuidedMissile : MissileScript
             return true;
         }
         
-        var colliders = Physics.OverlapSphere(transform.position, 50);
+        var colliders = Physics.OverlapSphere(transform.position, 30);
         return colliders.Any(collider => collider.gameObject.Equals(target));
     }
 

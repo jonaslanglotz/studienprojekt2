@@ -749,6 +749,7 @@ MonoBehaviour:
   maxSteeringAngle: 15
   baseDrag: 0.03
   engine: {fileID: 8369182822831958032}
+  explosion: {fileID: 1991776674465105626, guid: c5e854761ce482c41ab6fa5af2a3d06b, type: 3}
   engineLight: {fileID: 7006614703866763229}
   currentDrag: 0
   initializationTime: 0
