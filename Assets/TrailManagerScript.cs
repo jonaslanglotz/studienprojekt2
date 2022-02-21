@@ -2,10 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using Unity.CodeEditor;
-using Unity.Collections;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class TrailManagerScript : MonoBehaviour
