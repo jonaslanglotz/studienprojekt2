@@ -31,7 +31,7 @@ public class IronDomeBattery : MonoBehaviour
                 missileComponent.launcher = gameObject;
                 missileComponent.target = target;
 
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(5f);
             }
         }
     }

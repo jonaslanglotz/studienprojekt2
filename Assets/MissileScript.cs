@@ -27,10 +27,14 @@ public abstract class MissileScript : MonoBehaviour {
     public GameObject launcher;
     
     public GameObject target;
+
+    private TrailManagerScript _trailManager;
     
     protected void Start() {
         rb = GetComponent<Rigidbody>();
         initializationTime = Time.timeSinceLevelLoad;
+
+        _trailManager = FindObjectOfType<TrailManagerScript>();
     }
 
     private void FixedUpdate()
@@ -72,6 +76,11 @@ public abstract class MissileScript : MonoBehaviour {
         GetSteeringAngle().ToAngleAxis(out var steeringAngle, out var steeringAxis);
 
         rb.AddTorque(steeringAxis * (Mathf.Clamp(steeringAngle, -maxSteeringAngle, maxSteeringAngle) * steeringForce), ForceMode.Acceleration);
+
+        if (_trailManager != null)
+        {
+            _trailManager.ReportPosition(gameObject, position);
+        }
     }
 
     protected abstract bool ShouldExplode();

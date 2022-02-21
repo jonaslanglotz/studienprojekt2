@@ -4,7 +4,6 @@ using UnityEngine;
 public class CameraManager : MonoBehaviour
 {
     public GameObject focusedObject;
-    public GameObject defaultFocusedObject;
     public float distance;
     public Vector2 direction;
     public Vector3 offset;
@@ -15,6 +14,13 @@ public class CameraManager : MonoBehaviour
     
     private Vector2 _lastMousePosition;
     private Vector3 _lastFocusPosition;
+
+    private GameObject initialFocus;
+
+    private void Start()
+    {
+        initialFocus = focusedObject;
+    }
 
     private void Update()
     {
@@ -39,14 +45,18 @@ public class CameraManager : MonoBehaviour
 
             var mouseDelta = (mousePosition - _lastMousePosition) * sensitivity;
 
-            direction = new Vector2(direction.x + mouseDelta.x, Mathf.Clamp(direction.y - mouseDelta.y, -90, 90));
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                var drag = Quaternion.Euler(direction.y, direction.x, 0) * new Vector3(mouseDelta.x, mouseDelta.y);
+                offset -= distance * 0.01f * drag;
+            }
+            else
+            {
+                direction = new Vector2(direction.x + mouseDelta.x, Mathf.Clamp(direction.y - mouseDelta.y, -90, 90));
+            }
 
-            _lastMousePosition = mousePosition;
         }
-        else
-        {
-            _lastMousePosition = Input.mousePosition;
-        }
+        _lastMousePosition = Input.mousePosition;
     }
 
     private void HandleScroll()
@@ -61,7 +71,7 @@ public class CameraManager : MonoBehaviour
 
     private Vector3 CalculatePosition()
     {
-        var focusedObjectPosition = focusedObject != null ? focusedObject.transform.position : defaultFocusedObject.transform.position;
+        var focusedObjectPosition = focusedObject != null ? focusedObject.transform.position : _lastFocusPosition;
 
         Vector3 focusPosition;
         if (focusedObject != null && focusedObject.TryGetComponent<Rigidbody>(out _))
@@ -83,15 +93,17 @@ public class CameraManager : MonoBehaviour
         return position;
     }
 
-    public void SetFocus(GameObject gameObject)
+    public void SetFocus(GameObject focus)
     {
-        focusedObject = gameObject;
+        focusedObject = focus;
+        offset = Vector3.zero;
     }
 
     public void ResetCamera()
     {
         distance = DEFAULT_DISTANCE;
         direction = DEFAULT_DIRECTION;
-        focusedObject = null;
+        offset = Vector3.zero;
+        focusedObject = initialFocus;
     }
 }

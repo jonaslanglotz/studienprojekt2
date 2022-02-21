@@ -35,7 +35,7 @@ public class ProportionalNavigationHelper
     {
         var losNormal = Vector3.Cross(LineOfSight(), Vector3.Cross(LineOfSight(), LineOfSight() - (_targetLastPosition - _lastPosition))).normalized;
         var accelerationMagnitude = _gain * RelativeVelocity().magnitude * AngularRate().magnitude + (_gain / 2) * ComponentOfVectorInDirection(Vector3.up * -9.81f, losNormal);
-        return LineOfSight().normalized * 5 - losNormal * accelerationMagnitude;
+        return LineOfSight().normalized * 10 - losNormal * accelerationMagnitude;
     }
 
     private static float ComponentOfVectorInDirection(Vector3 vector, Vector3 direction)
